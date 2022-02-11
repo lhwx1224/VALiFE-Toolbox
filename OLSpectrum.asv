@@ -83,7 +83,6 @@ while dOmega ~= 0
     plot(x)
 end
 legend(string(legends))
-pbaspect([2 1 1])
 Omega(1,:) = [];
 figure(1),clf
 imagesc(Omega)
