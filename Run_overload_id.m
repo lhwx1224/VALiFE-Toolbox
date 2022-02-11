@@ -4,47 +4,17 @@
 clear; clc;
 tic
 % close all;
-rng(100); % setting the random seed for repeatable purpose
 peak_num = 10; % number of peaks value
 min_val = 0; % set the minimum stress value
 max_val = 10; % set the maximum stress value
-peaks_val = rand(11,1)*peak_num;  % set the peaks value
-j = 1;
-tot_points = numel(peaks_val)*2+1; % total number of data points
-X = zeros(tot_points,1);
-for i =1:tot_points
-    if rem(i,2)==0 % set the peaks value at the even number
-        X(i) = peaks_val(j);
-        j = j+1;
-    else
-        X(i) = min_val;
-    end
-end
+seed = 100; % setting the random seed for repeatable purpose
 
-xt = 0:tot_points-1;
-yt = X;
-[peaks_value,idx_peaks] = findpeaks(yt);
-
-[c,hist,edges,rmm,idx] = rainflow(yt);
-T = array2table(c,'VariableNames',{'Count','Range','Mean','Start','End'});
-[xt_updated,yt_updated,xpeak,ypeak] = checking_overloading(T,xt,yt,yt,1);
-store_ol_ids(1) = xpeak;
-peak_store(1,1:2)= [xpeak,ypeak];
-plot(xt,yt,'-o')
-str =split(num2str(xt));
-text(xt,yt+0.2,str,'Color','red','FontSize',12)
-jj = 2;
-disp('Rainflow counting starting....')
-while ~isnan(xpeak)    
-    [c,hist,edges,rmm,idx] = rainflow(yt_updated);
-    T = array2table(c,'VariableNames',{'Count','Range','Mean','Start','End'});
-    [xt_updated,yt_updated,xpeak,ypeak] = checking_overloading(T,xt_updated,yt_updated,yt,jj);
-    if ~isnan(xpeak)
-        store_ol_ids(jj) = xpeak;
-        peak_store(jj,1:2)= [xpeak,ypeak];
-    end
-    jj = jj+1;
-end
+% --------- generating the stress history dataset -----------
+[yt]=generate_stress_history(seed,min_val,max_val,peak_num); 
+xt = 0:size(yt,1)-1; % the index set of peaks value or time
+% --------- indetified al the overloaded peaks -----------
+[peak_store,store_ol_ids]=identification_overloading_sweeping(yt,xt);
+% --------- Display the plots -----------
 disp('Rainflow counting ended')
 figure(1)
 subplot(211)
