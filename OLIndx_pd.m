@@ -76,22 +76,32 @@ switch OLmetric
         Metric_text = 'Geometric Mean --- $\sqrt{\Delta\sigma^{+}\Delta\sigma_{\max}}$';
 end
 
+% ALLOCATE MEMORY FOR THE OVERLOAD INDEX
 OLI = zeros(Nbins,size(pd,1));
+% SIFT OUT THE OVERLOAD BY LEVELS OF METRICS
 
+% FOR in total Nbins number of subsections of metric, 
 for i = 1:Nbins
-    OLI(i, :) = metric(:,2) >= edges(i) & metric(:,2) < edges(i+1) & pd(:,2) > 0;
+    % Find the peak such that the metric falls into each bin
+    OLI(i, :) = metric(:,2) >= edges(i) & metric(:,2) < edges(i+1) & pd(:,2) > 0; 
+    % IF the last bin, consider the upper bound of the last bin as well
     if i == Nbins
         OLI(i, :) = metric(:,2) >= edges(i) & metric(:,2) <= edges(i+1) & pd(:,2) > 0;
     end
-end
+    % END IF
+end % END FOR
 
+% MAKE OVERLOAD INDICES INTO LOGICAL ARRAYS
 OLI = logical([OLI zeros(size(OLI,1),1)]);
+% FLIP THE OVERLOAD INDICES S.T. THE ROWS OF INDICES ARE IN ACCORDANCE WITH
+% AN INCREASING OL AMPLITUDE
 OLI = flipud(OLI);
-% Detect Empty Bins
+% DELETE EMPTY BINS
 OLIsum = sum(OLI, 2);
 OLIempty = OLIsum == 0;
 OLI(OLIempty, :) = [];
 p = cell(size(OLI,1),1);
+% IF NO OUTPUT, plot a diagram
 if nargout == 0
     figure(1),clf
     pp = plot(xindx,x,'color',DefColor{1});

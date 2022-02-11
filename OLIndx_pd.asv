@@ -9,19 +9,18 @@ function OLI = OLIndx_pd(x, Nbins, OLmetric)
 %        OLmetric - metric used to identify overloads
 %                   'pd' - peak difference, sigmamax(i) - sigmamax(i + 1)
 %                   'lcr' - loading cycle range, sigmamax(i) - sigmamin(i)
-%                   'prouct' - sqrt(pd*lcr)
+%                   'prouct' - sqrt(pd*lcr), the geometric average of the
+%                   peak difference and loading cycle range.
 %
-%
-% 
-%
-% 
+% VALiFE-toolbox v0.0
 % Copyright by Hewenxuan Li, hewenxuan_li@uri.edu
+% Created on 2/11/2022
 
-addpath('OS')
-[Markers, ~, Mycolors] = mystyle();
-DefColor = Mycolors.defaultcolor;
+addpath('OS')                       % Load options
+[Markers, ~, Mycolors] = mystyle(); % Define visualization style
+DefColor = Mycolors.defaultcolor;   % Define default MATLAB colors
 
-% Check the input size
+% Check the input size: default options Nbins = 2; OLmetric = 'product'.
 if nargin < 1
     smin = [0 0 0 0 0 0 0 0 0]';
     smax = [3 4 5 1 4 3 5 2 1.8]';
@@ -35,13 +34,16 @@ elseif nargin < 2
 else
     OLmetric = 'product';
 end
-
-xindx = 1:length(x);
+tic
+xindx = 1:length(x);                % index used for reversal id
 
 % ------------------------------------------------------------------------
 %                IDENTIFY OVERLOADS USING PD ALGORITHM
 % ------------------------------------------------------------------------
-[sigmamax, sigmamin, lcr, pd, ol, ~, ~, ~] = drivefactor(x, 'true'); % call drivefactor for Smax, Smin, and \Delta S
+% call drivefactor for Smax, Smin, lcr, pd, and ol
+% Maximum stress, minimum stress, loading cycle range, peak difference,
+% peak-difference-related overload candidates:
+[sigmamax, sigmamin, lcr, pd, ol, ~, ~, ~] = drivefactor(x, 'true'); 
 
 % ------------------------------------------------------------------------
 %                SIFTING OVERLOADS ACCORDING TO THE LCR
@@ -71,13 +73,18 @@ switch OLmetric
         prod_bin_edges = linspace(prod_min,prod_max,Nbins + 1);
         edges = prod_bin_edges;
         metric = prod(1:end,:);
-        Metric_text = 'Geometric Mean --- $\sqrt{\Delta\sigma^{+}\Delta\sigma_\max}$';
+        Metric_text = 'Geometric Mean --- $\sqrt{\Delta\sigma^{+}\Delta\sigma_{\max}}$';
 end
 
+% ALLOCATE MEMORY FOR THE OVERLOAD INDEX
 OLI = zeros(Nbins,size(pd,1));
+% SIFT OUT THE OVERLOAD BY LEVELS OF METRICS
 
+% FOR in total Nbins number of subsections of metric, 
 for i = 1:Nbins
-    OLI(i, :) = metric(:,2) >= edges(i) & metric(:,2) < edges(i+1) & pd(:,2) > 0;
+    % Find the peak such that the metric falls into each bin
+    OLI(i, :) = metric(:,2) >= edges(i) & metric(:,2) < edges(i+1) & pd(:,2) > 0; 
+    % IF the last cycle
     if i == Nbins
         OLI(i, :) = metric(:,2) >= edges(i) & metric(:,2) <= edges(i+1) & pd(:,2) > 0;
     end
@@ -110,5 +117,5 @@ if nargout == 0
     pbaspect([2 1 1])
     title(['Overload ID Result using ', Metric_text])
 end
-
+toc
 return
