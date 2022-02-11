@@ -75,13 +75,6 @@ end
 % if x(end) - x(end - 1) < 0
 %     sigmamin(:,1) = sigmamin(:,1) - 2;
 % end
-
-plot(x1,'k--');
-hold on
-plot(xindx,x,'r');
-plot(locsy, pksy, '*')
-plot(locs,pks,'x')
-
 % ---------- Reshape the cycle history for fatigue analysis ----------
 % The following lines makes sure the seqeunce always starts with a minimum
 % or, equivalently, always starts with a loading cycle range
@@ -141,4 +134,17 @@ lcr_ol = sigmamax(indx,2) - sigmamin(indx,2);           % LCR wrt OL
 % sigmamin = sigmamin(1:end-1,:);
 sigmam  = [sigmamax(1:minls,1) 0.5*(sigmamax(1:minls,2) + sigmamin(1:minls,2))];
 sar = [sigmamax(1:minls,1) sqrt(sigmamax(1:minls,2).*lcr(1:minls,2)/2)];
+
+if nargout == 0
+plot(x1,'k--');
+hold on
+plot(xindx,x,'r');
+plot(locsy, pksy, 'k*')
+plot(locs,pks,'kx')
+legend('Complementary Reversals','Reversals','$\sigma_\mathrm{min}$','$\sigma_\mathrm{max}$')
+xlabel('Reservsals')
+ylabel('Stress Magnitude')
+pbaspect([2 1 1])
+end
+
 end
