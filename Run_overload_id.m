@@ -2,13 +2,14 @@
 % stress time history. 
 
 clear; clc;
-tic
+
 % close all;
 rng(100); % setting the random seed for repeatable purpose
 peak_num = 10; % number of peaks value
 min_val = 0; % set the minimum stress value
 max_val = 10; % set the maximum stress value
 peaks_val = rand(11,1)*peak_num;  % set the peaks value
+peaks_val = [3 4 5 1 4 3 5 2 1.8]';
 j = 1;
 tot_points = numel(peaks_val)*2+1; % total number of data points
 X = zeros(tot_points,1);
@@ -20,7 +21,7 @@ for i =1:tot_points
         X(i) = min_val;
     end
 end
-
+tic
 xt = 0:tot_points-1;
 yt = X;
 [peaks_value,idx_peaks] = findpeaks(yt);
@@ -45,6 +46,7 @@ while ~isnan(xpeak)
     end
     jj = jj+1;
 end
+toc
 disp('Rainflow counting ended')
 figure(1)
 subplot(211)
@@ -59,5 +61,5 @@ plot(xt,yt_updated)
 str1 =num2str(peak_store(:,1));
 text(peak_store(:,1),peak_store(:,2)+0.2,str1,'Color','red','FontSize',12)
 title('Identification of over loading')
-toc
+
 
