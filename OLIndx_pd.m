@@ -31,7 +31,7 @@ if nargin < 1
 elseif nargin < 2
     Nbins = 2;
     OLmetric = 'product';
-else
+elseif nargin < 3
     OLmetric = 'product';
 end
 tic
@@ -91,6 +91,10 @@ for i = 1:Nbins
     % END IF
 end % END FOR
 
+% ------------------------------------------------------------------------
+%          POST-PROCESSING THE OVERLOAD IDENTIFICATION RESULTS
+% ------------------------------------------------------------------------
+
 % MAKE OVERLOAD INDICES INTO LOGICAL ARRAYS
 OLI = logical([OLI zeros(size(OLI,1),1)]);
 % FLIP THE OVERLOAD INDICES S.T. THE ROWS OF INDICES ARE IN ACCORDANCE WITH
@@ -104,18 +108,20 @@ p = cell(size(OLI,1),1);
 % IF NO OUTPUT, plot a diagram
 if nargout == 0
     figure(1),clf
-    pp = plot(xindx,x,'color',DefColor{1});
-    hold on
+    pp = plot(xindx,x,'color',DefColor{1});   % Plot the original reversals
+    hold on 
     for i = 1:size(OLI,1)
+        % plot the identified overload on top of the reversals
             p{i} = plot(sigmamax(OLI(i,:),1), sigmamax(OLI(i,:),2), 'v',...
             'markerfacecolor', DefColor{i}, 'MarkerEdgeColor', DefColor{i});
     end
+    % Designate a pool of legends
     legends = {'OL Level 1','OL Level 2','OL Level 3','OL Level 4',...
         'OL Level 5','OL Level 6','OL Level 7','OL Level 8',...
         'OL Level 9','OL Level 10'};
-    legend([pp, p{:}],{'Reversals',legends{1:length(p)}})
-    xlabel('Reservsals')
-    ylabel('Stress Magnitude')
+    legend([pp, p{:}],{'Reversals',legends{1:length(p)}}) % Legend
+    xlabel('Reservsals')          % xlabel 
+    ylabel('Stress Magnitude')    % ylabel
     xticks(2:2:length(x));
     axis tight
     grid on

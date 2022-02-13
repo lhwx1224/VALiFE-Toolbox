@@ -18,7 +18,8 @@ function Omega = OLSpectrum(x, reversals, cumulative)
 %                 and 1 indicates the corresponding peaks is an overload
 %                 candidate.
 %
-%
+% Copyright by Hewenxuan Li, hewenxuan_li@uri.edu
+% Created on 2/7/2022
 
 if nargin < 1
     % -------------------- Test reversal history -------------------------
@@ -73,15 +74,18 @@ end
 % ------------------------------------------------------------------------
 % Iterative Identification of OVERLOAD CANDIDATES
 % ------------------------------------------------------------------------
+% Figure for the iterative identification of overload
 figure(2),clf
 plot(x)
 hold on
+% --------- Initiate the overload identification iteration ---------------
 rng(1);
 omega_temp = zeros(1, size(sigmamax,1)); % Temporary overload identifier vector
 Omega = randn(1,size(sigmamax,1)); % Temporary overload identifier vector
 dOmega = 1;
 count = 0;
 legends = [];
+% ---- Begin the while loop unless two consecutive rows are identical ----
 while dOmega ~= 0
     if ~reversals
         % Converting signal to reversals using sig2revs function
@@ -91,25 +95,25 @@ while dOmega ~= 0
     else
         RF = rainflow(x);
     end
-    [~,I] = sort(RF(:,4));          % Sort the result according to the starting indices of reversals
-    RF = RF(I,:);                    % Execute the sort to the rainflow matrix
+    [~,I] = sort(RF(:,4));             % Sort the result according to the starting indices of reversals
+    RF = RF(I,:);                      % Execute the sort to the rainflow matrix
     RF = [RF, RF(:,5) - RF(:,4) ~= 1]; % Calculate the distance between the starting index and the ending index of the half cycle
     RF = [(1:size(RF,1))', RF];        % Append index to the rainflow matrix
-    OLCindx = RF(RF(:,7) == 1,5);      %
+    RFOLC = RF(RF(:,7) == 1,:);        % Define the rainflow overlaod candidate matrix 
     if cumulative
-        omega_temp(OLCindx/2) = 1;    % Keep the previous overload index
+        omega_temp(RFOLC(:,5)/2) = 1;     % Keep the previous overload index
     else
         omega_temp = zeros(1, size(sigmamax,1)); % Reset temporary overload identifier vector
-        omega_temp(OLCindx/2) = 1;
+        omega_temp(RFOLC(:,5)/2) = 1;
     end
-    RFOLC = RF(RF(:,7) == 1, :);
+%     RFOLC = RF(RF(:,7) == 1, :);
     for i = 1:size(RFOLC,1)
         if mod(RFOLC(i,5),2) == 0 % IF It is a unloading half cycle
-%         x(RF(RFOLC(i,1),5)) = 0.01;
-            x(RF(RFOLC(i,1),5)) = min(sigmamax(:,2));
+%             x(RF(RFOLC(i,1),5)) = min(sigmamax(:,2));
+            x(RFOLC(i,5)) = min(sigmamax(:,2));
         elseif mod(RFOLC(i,5),2) ~= 0 % IF It is a loading half cycle
-%         x(RF(RFOLC(i,1),6)) = 0.01;
-            x(RF(RFOLC(i,1),6)) = min(sigmamax(:,2));
+%             x(RF(RFOLC(i,1),6)) = min(sigmamax(:,2));
+            x(RFOLC(i,6)) = min(sigmamax(:,2));
         end
     end
     Omega = [Omega; omega_temp];

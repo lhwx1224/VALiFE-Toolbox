@@ -47,12 +47,9 @@ for i = 1:rol
     oli_ol = OLI_ol(1, OLI_ol(2,:) == 1);     % Retain the index of OL
     oli_ol = [oli_ol; sum(OLI(:,oli_ol), 1)]; % Obtain the sum of the OL in the OLI matrix
 %     oli_ol = [oli_ol(:,1), oli_ol];
-    % Overload level difference and distance difference matrix
-    dpli_ol = oli_ol(:,2:end) - oli_ol(:, 1:end-1);   
-    % Find the ones that are less than the defined rol and is a previously
-    % identified overload and use them as negating indices.
-    flag = oli_ol(1,dpli_ol(1,:) == i & dpli_ol(2,:) < 0) + i; 
-    % Negate the identified non-overloads
+    dpli_ol = oli_ol(:,2:end) - oli_ol(:, 1:end-1); 
+    
+    flag = oli_ol(1,dpli_ol(1,:) == i & dpli_ol(2,:) < 0) + i;
     OLI(:,flag) = zeros(size(OLI,1),length(flag));
 end
 
