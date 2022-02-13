@@ -20,7 +20,7 @@ function Omega = OLSpectrum(x, reversals, cumulative)
 %
 % Copyright by Hewenxuan Li, hewenxuan_li@uri.edu
 % Created on 2/7/2022
-
+addpath('OS')
 if nargin < 1
     % -------------------- Test reversal history -------------------------
     smin = [0 0 0 0 0 0 0 0 0]';
@@ -74,10 +74,10 @@ end
 % ------------------------------------------------------------------------
 % Iterative Identification of OVERLOAD CANDIDATES
 % ------------------------------------------------------------------------
-% Figure for the iterative identification of overload
-figure(2),clf
-plot(x)
-hold on
+
+if nargout == 0
+X = x; 
+end
 % --------- Initiate the overload identification iteration ---------------
 rng(1);
 omega_temp = zeros(1, size(sigmamax,1)); % Temporary overload identifier vector
@@ -120,19 +120,27 @@ while dOmega ~= 0
     dOmega = sum(abs(Omega(end,:) - Omega(end - 1,:)));
     count = count + 1;
     legends = [legends, strcat("Iteration #",num2str(count))];
-    plot(x)
+    if nargout == 0
+        X = [X, x];
+    end
+%     plot(x)
 end
 
-legend(string(legends))
-pbaspect([2 1 1])
 Omega(1,:) = [];
 
 if ~cumulative
     Omega(end-1:end,:) = [];
 end
 
-figure(1),clf
-imagesc(Omega)
-pbaspect([2 1 1])
+if nargout == 0
+    % Figure for the iterative identification of overload
+    figure(2),clf
+    plot(X)
+    legend(string(legends))
+    pbaspect([2 1 1])
 
+    figure(1),clf
+    imagesc(Omega)
+    pbaspect([2 1 1])
+end
 return
