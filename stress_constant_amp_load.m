@@ -34,3 +34,4 @@ hold(axes_parent,'off');
 % Set the remaining axes properties
 set(axes_parent,'FontName','Arial','FontSize',12,'FontWeight','bold','LineWidth',...
     1.5);
+pbaspect([2 1 1])
