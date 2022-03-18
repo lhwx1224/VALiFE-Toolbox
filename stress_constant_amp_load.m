@@ -1,5 +1,5 @@
 clc; clear; 
-% 
+% vlvlvlv
 sigma_min = 0; % the minimum stress range history
 sigma_baseline = 1; % the baseline stress
 % this is the stress cylic unit that form as a base for the stress reversal
