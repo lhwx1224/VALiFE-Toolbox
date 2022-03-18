@@ -19,6 +19,8 @@ ols_ratio = 1.5; % the stress ratio = stress_max/stress_base_line
 stress_ols(ols_indx) = sigma_baseline*ols_ratio;
 % stress_ols(end-1) = sigma_baseline;
 
+
+
 % Create plot
 h = figure();
 axes_parent = axes('Parent',h);
